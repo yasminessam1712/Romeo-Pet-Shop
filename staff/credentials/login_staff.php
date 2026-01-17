@@ -207,6 +207,69 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             .shop-title h1 {
                 font-size: 40px;
             }
+        } 
+        /* Loader overlay */
+        #loginLoader {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(248, 241, 228, 0.95);
+            /* soft cream */
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+            font-family: 'Poppins', sans-serif;
+            color: #4b3621;
+            text-align: center;
+        }
+
+        #loginLoader .loader {
+            width: 70px;
+            height: 70px;
+            border: 6px solid #f8f1e4;
+            border-top: 6px solid #d17878;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        /* Add a cute paw overlay */
+        #loginLoader .loader::after {
+            content: "🐾";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 28px;
+        }
+
+        #loginLoader h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #d17878;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media(max-width:420px) {
+            .login-container {
+                width: 90%;
+                padding: 35px 25px;
+            }
+
+            .shop-title h1 {
+                font-size: 40px;
+            }
         }
     </style>
 </head>
@@ -228,7 +291,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="error-msg"><?php echo $login_error; ?></div>
             <?php endif; ?>
 
-            <form method="POST" action="login_staff.php">
+            <form id="loginForm" method="POST" action="login_staff.php">
                 <div class="input-group">
                     <label for="email">Email</label>
                     <input type="email" name="email" required placeholder="Enter your email">
@@ -244,11 +307,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         </div>
     </div>
+    <!-- Loader Overlay -->
+    <div id="loginLoader">
+        <div class="loader"></div>
+        <h2>Logging In...</h2>
+    </div>
 
     <footer>
         © <?= date("Y") ?> Romeo Pet Shop. All Rights Reserved.
     </footer>
 
+    <script>
+        // Show loader when submitting the form
+
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault(); // Stop immediate submission
+            document.getElementById('loginLoader').style.display = 'flex';
+
+            // Wait 2 seconds before submitting the form
+            setTimeout(() => {
+                e.target.submit(); // Submit the form after delay
+            }, 2000); // 2000ms = 2 seconds
+        });
+
+    </script>
 </body>
 
 </html>

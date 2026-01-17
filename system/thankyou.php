@@ -330,10 +330,50 @@ $total_price = 0;
                 gap: 10px;
             }
         }
+        /* LOADING SCREEN */
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 250, 243, 0.97);
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader-box {
+            text-align: center;
+            color: #4b3621;
+        }
+
+        .loader-box p {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .paw {
+            font-size: 50px;
+            animation: bounce 1.2s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
     </style>
 </head>
 
 <body>
+        <!-- LOADING SCREEN -->
+    <div id="loadingScreen">
+        <div class="loader-box">
+            <div class="paw">🐾</div>
+            <p>Processing your order...</p>
+        </div>
+    </div>
+
 
     <!-- NAVIGATION -->
     <nav>
@@ -420,6 +460,15 @@ $total_price = 0;
         function closeLogoutModal() { document.getElementById("logoutModal").style.display = "none"; }
         function confirmLogout() { window.location.href = "../customer/credentials/logout.php"; }
     </script>
+    <script>
+    window.addEventListener("load", function () {
+        setTimeout(() => {
+            document.getElementById("loadingScreen").style.opacity = "0";
+            document.getElementById("loadingScreen").style.pointerEvents = "none";
+        }, 2000); // 1.2s loading
+    });
+    </script>
+
 
 </body>
 

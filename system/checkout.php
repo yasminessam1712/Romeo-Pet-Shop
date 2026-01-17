@@ -38,7 +38,7 @@ while ($item = $cart_result->fetch_assoc()) {
     $total_amount += $item['subtotal'];
     $cart_items[] = $item;
 }
-$delivery_fee = 5; // Flat RM10 delivery
+$delivery_fee = 5; // Flat RM5 delivery
 
 
 
@@ -583,7 +583,7 @@ VALUES (?, ?, ?, ?, ?, ?)
 
 
                 <label for="card_number">Card Number</label>
-                <input type="text" id="card_number" name="card_number" maxlength="19" placeholder="1234 5678 9012 3456"
+                <input type="text" id="card_number" name="card_number" maxlength="16" placeholder="1234 5678 9012 3456"
                     required>
                 <div id="card_number_error" class="error-msg">Card number must be 16 digits.</div>
 
@@ -702,14 +702,21 @@ VALUES (?, ?, ?, ?, ?, ?)
             let city = document.getElementById('city').value;
             let postcode = document.getElementById('postcode').value.trim();
 
-            // Street: must start with number
-            let streetRegex = /^[0-9]+[A-Za-z0-9\s\/]+$/;
+            // Street: allow letters, numbers, spaces, / , . -
+            let streetRegex = /^[A-Za-z0-9][A-Za-z0-9\s\/,.-]*$/;
+
             if (!streetRegex.test(street)) {
                 document.getElementById('street_error').style.display = 'block';
                 valid = false;
             } else {
                 document.getElementById('street_error').style.display = 'none';
             }
+            if (!streetRegex.test(street) || street.length < 3) {
+            document.getElementById('street_error').style.display = 'block';
+            valid = false;
+            }
+
+
 
             // City: must select
             if (!city) {

@@ -50,6 +50,7 @@ SELECT
     o.arrival_date,
     o.status,
     o.tracking_id,
+    o.delivery_fee,
     p.name AS product_name,
     p.image_path AS product_image,
     oi.quantity,
@@ -78,6 +79,7 @@ while ($row = $result->fetch_assoc()) {
             "arrival_date" => $row['arrival_date'],
             "status" => $row['status'],
             "tracking_id" => $row['tracking_id'],
+            "delivery_fee" => $row['delivery_fee'],
             "items" => []
         ];
     }
@@ -499,7 +501,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .order-number-left {
-            position: absolute;
+            
             left: 12px;
             top: 18px;
             font-weight: 700;
@@ -571,24 +573,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($orders as $id => $o): ?>
 
                 <div class="order-card">
-                    <div class="order-number-left">
-                        <?= $counter ?>.
-                    </div>
+                    
 
                     <?php
-                    $total = 0;
+                    $itemTotal = 0;
                     foreach ($o['items'] as $i) {
-                        $total += ($i['price'] * $i['quantity']);
+                        $itemTotal += ($i['price'] * $i['quantity']);
                     }
+
+                    $deliveryFee = $o['delivery_fee'] ?? 0;
+                    $grandTotal = $itemTotal + $deliveryFee;
+
                     ?>
-                    <div style="text-align:right; font-size:17px; font-weight:700; margin-top:10px; color:#4b3621;">
-                        Total Price: RM <?= number_format($total, 2) ?>
-                    </div>
+
+
 
                     <div class="order-header">
                         <div>
 
-                            <strong>Order ID: <?= $id ?></strong><br>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="order-number-left"><?= $counter ?>.</span>
+                                <strong>Order ID: <?= $id ?></strong>
+                            </div>
+
+                            
+
                             Customer: <?= htmlspecialchars($o['full_name']) ?><br>
                             Email: <?= htmlspecialchars($o['email']) ?><br>
                             Phone: <?= htmlspecialchars($o['phone']) ?><br>
@@ -600,12 +609,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 Tracking: <?= $o['tracking_id'] ?: '<em>Not set</em>' ?>
                             </div>
                         </div>
+
+                        <div style="text-align:right; font-size:15px; color:#4b3621;">
+                        <div>Items Total: RM <?= number_format($itemTotal, 2) ?></div>
+                        <div>Delivery Fee: RM <?= number_format($deliveryFee, 2) ?></div>
+                        <div style="font-size:17px; font-weight:700; margin-top:6px;">
+                            Total Fee: RM <?= number_format($grandTotal, 2) ?>
+                        </div>
                         <div class="status-badge"
                             style="background: <?= $statusColors[$o['status']] ?? '#ccc' ?>; margin-top: 10px;">
                             <?= ucfirst($o['status']) ?>
                         </div>
                     </div>
-
+                    </div>
 
                     <div class="items">
                         <?php foreach ($o['items'] as $item): ?>
@@ -630,12 +646,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label>
                             Arrival Date:
                             <input type="date" name="arrival_date"
-                                value="<?= $o['arrival_date'] ? date('Y-m-d', strtotime($o['arrival_date'])) : '' ?>">
+                            value="<?= $o['arrival_date'] ? date('Y-m-d', strtotime($o['arrival_date'])) : '' ?>"
+                            <?= $o['status'] === 'Completed' ? 'disabled' : '' ?>>
+
 
 
                             <label style="margin-left:40px;">
                                 Status:
-                                <select name="status">
+                                <select name="status" <?= $o['status'] === 'Completed' ? 'disabled' : '' ?>>
                                     <?php foreach (['Packing', 'Out for Delivery', 'Completed', 'Cancelled'] as $s): ?>
                                         <option value="<?= $s ?>" <?= $o['status'] == $s ? 'selected' : '' ?>><?= $s ?></option>
                                     <?php endforeach; ?>
@@ -643,8 +661,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </label>
 
 
-                            <button
-                                style="padding:8px 22px; margin-left:320px; border-radius:8px; background:#d17878; color:#fff; border:none; font-weight:700; cursor:pointer;">Update</button>
+                            <?php if ($o['status'] === 'Completed'): ?>
+                                <button type="button" disabled
+                                    style="padding:8px 22px; margin-left:320px; border-radius:8px; background:white; color:white; border:none; font-weight:700;">
+                                    Completed
+                                </button>
+                            <?php else: ?>
+                                <button type="submit"
+                                    style="padding:8px 22px; margin-left:320px; border-radius:8px; background:#d17878; color:#fff; border:none; font-weight:700; cursor:pointer;">
+                                    Update
+                                </button>
+                            <?php endif; ?>
+
                     </form>
 
                 </div>
